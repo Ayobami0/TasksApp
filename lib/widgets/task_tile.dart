@@ -33,11 +33,15 @@ class TaskTile extends ConsumerWidget {
         },
         key: key!,
         child: ListTile(
+          onTap: null,
           title: Text(task.title,),
           subtitle: Row(
             children: [
               const Icon(Icons.schedule),
-              Text('Due At: ${task.dueDate ?? "-"}')
+              const SizedBox(width: 10,),
+              if (task.status == TaskStatus.pending) Text('Due At: ${task.formatDueDate() ?? "-"}')
+              else if(task.status == TaskStatus.completed) const Text('Task Completed')
+              else const Text('Task Expired')
             ],
           ),
           trailing: task.status != TaskStatus.completed ? IconButton(

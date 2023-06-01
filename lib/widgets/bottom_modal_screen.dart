@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:tasks/models/task.dart';
 import 'package:uuid/uuid.dart';
 
@@ -19,6 +20,8 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
 
   final TextEditingController _contentController = TextEditingController();
 
+  DateTime? _selectedDateTime;
+
   Future _saveTask() async{
     final isValid = _formKey.currentState!.validate();
 
@@ -32,7 +35,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
     final Task newTask = Task(
       id:const Uuid().v4(),
       startDate: DateTime.now(),
-      dueDate: DateTime.now(),
+      dueDate: _selectedDateTime,
       title: _titleController.value.text,
       content: _contentController.value.text,
     );
@@ -70,13 +73,41 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
               children: [
                 CustomTextField(hintText: 'Title', controller: _titleController, keyboardType: TextInputType.text, validate: true,),
                 CustomTextField(hintText: 'Content', controller: _contentController, keyboardType: TextInputType.multiline,),
-                TextButton.icon(
-                  onPressed: (){}, 
-                  icon: const Icon(Icons.event), 
-                  label: const Text('Due Date'),
+                Column(
+                  children: [
+                    TextButton.icon(
+                      onPressed: () async{
+                        await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2050)
+                        ).then((dateValue) async{
+                          if (dateValue == null) return;
+                          await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now()
+                          ).then((timeValue){
+                            setState(() {
+                              if (timeValue == null) return;
+                              _selectedDateTime = dateValue.add(Duration(
+                                hours: timeValue.hour,
+                                minutes: timeValue.minute
+                              ));
+                            });
+                          });
+                        }).onError((error, stackTrace){
+                          print(error);
+                        });
+                      }, 
+                      icon: const Icon(Icons.event), 
+                      label: const Text('Due Date'),
+                    ),
+                    Text(_selectedDateTime != null ? DateFormat.yMMMEd().add_jm().format(_selectedDateTime!) : '-')
+                  ],
                 ),
                 _isSaving ? const CircularProgressIndicator() : ElevatedButton(
-                  onPressed: _isSaving ? null :() async{
+                  onPressed: () async{
                                       await _saveTask();
                                     },
                   child: const Text('CREATE TASK')

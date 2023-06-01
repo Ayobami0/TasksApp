@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 enum TaskStatus {
   completed,pending,overdue
@@ -14,6 +15,11 @@ class Task {
   final TaskStatus status; 
   
   Task({this.isPinned=false, this.status=TaskStatus.pending, required this.id, required this.title, required this.content,required this.dueDate, required this.startDate});
+
+  formatDueDate(){
+    if(dueDate == null) return;
+    return DateFormat.yMMMEd().add_jm().format(dueDate!);
+  }
 }
 
 class TasksNotifier extends StateNotifier<List<Task>>{
