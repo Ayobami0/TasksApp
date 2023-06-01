@@ -39,12 +39,13 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 10,),
               Expanded(
                 child: taskList.isEmpty ? Column(
-                  children: [
+                  children: const [
                     Text('You have no tasks!')
                   ],
-                )  : ListView.builder(
+                )  : ListView.separated(
+                  separatorBuilder: (context, idx) =>const SizedBox(height: 10),
                   itemCount: taskList.length,
-                  itemBuilder: (ctx, idx)=>TaskTile(task: taskList[idx]),
+                  itemBuilder: (ctx, idx)=>TaskTile(task: taskList[idx], key: UniqueKey(),),
                 ),
               )
             ],

@@ -1,52 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tasks/models/task.dart';
 import 'package:tasks/widgets/delete_dialog.dart';
 
-class TaskTile extends StatelessWidget {
+class TaskTile extends ConsumerWidget {
   final Task task;
-  const TaskTile({super.key, required this.task});
-
+  const TaskTile({required super.key, required this.task});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: const Offset(0, 0),
-            blurRadius: 3,
-            spreadRadius: 1
-          ),
-        ],
-        borderRadius: BorderRadius.circular(4)
-      ),
+  Widget build(BuildContext context, ref) {
+    return Card(
+      elevation: 4,
       child: Dismissible(
-        secondaryBackground: Container(
+        background: Container(
           padding: const EdgeInsets.only(right: 20),
       decoration: BoxDecoration(
         color: Colors.red,
-        borderRadius: BorderRadius.circular(4)
+        borderRadius: BorderRadius.circular(2)
       ),
           alignment: Alignment.centerRight, 
           child: const Icon(Icons.delete)
         ),
-        background: Container(),
+        // background: Container(),
         direction: DismissDirection.endToStart,
+        confirmDismiss: (_) async{
+          return await showDeleteDialog(context);
+        },
         onDismissed: (_){
-          showDeleteDialog(context);
+          ref.watch(taskProvider.notifier).removeFromTasks(task.id);
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Task deleted!')));
         },
         key: key!,
         child: ListTile(
-          tileColor: Theme.of(context).colorScheme.surface,
-          title: Text(task.title),
-          trailing: FittedBox(
-            child: IconButton(
-              onPressed: (){},
-              icon: const Icon(Icons.check)
-            ),
+          title: Text(task.title,),
+          subtitle: Row(
+            children: [
+              const Icon(Icons.schedule),
+              Text('Due At: ${task.dueDate ?? "-"}')
+            ],
           ),
+          trailing: task.status != TaskStatus.completed ? IconButton(
+            onPressed: (){
+              ref.watch(taskProvider.notifier).updateTaskStatus(task.id, TaskStatus.completed);
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Task completed!')));
+            },
+            icon: const Icon(Icons.check)
+          ) : const Icon(Icons.task_alt, color: Colors.green,),
         ),
       ),
     );

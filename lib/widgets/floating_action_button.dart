@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasks/widgets/bottom_modal_screen.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
   final Function() onPressed;
@@ -7,10 +8,16 @@ class CustomFloatingActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      onPressed: (){},
+      onPressed: (){
+        showDialog(
+          context: context,
+          builder: (context) => const CreateTaskDialog()
+        );
+      },
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8)
       ),
+      child: const Icon(Icons.add),
     );
   }
 }
