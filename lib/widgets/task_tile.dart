@@ -29,7 +29,7 @@ class TaskTile extends ConsumerWidget {
           return await showDeleteDialog(context);
         },
         onDismissed: (_){
-          ref.watch(taskProvider.notifier).removeFromTasks(task.id);
+          ref.read(taskProvider.notifier).removeFromTasks(task.id);
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Task deleted!')));
         },
@@ -50,7 +50,7 @@ class TaskTile extends ConsumerWidget {
           ),
           trailing: task.status == TaskStatus.pending ? IconButton(
             onPressed: (){
-              ref.watch(taskProvider.notifier).updateTaskStatus(task.id, TaskStatus.completed);
+              ref.read(taskProvider.notifier).updateTaskStatus(task.id, TaskStatus.completed);
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Task completed!')));
             },

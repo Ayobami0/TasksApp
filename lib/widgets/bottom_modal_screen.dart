@@ -42,7 +42,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       content: _contentController.value.text,
     );
     
-    ref.watch(taskProvider.notifier).addToTasks(newTask);
+    ref.read(taskProvider.notifier).addToTasks(newTask);
     _formKey.currentState!.save();
     await Future.delayed(const Duration(seconds: 2)).then((value) {
       Navigator.pop(context);
@@ -52,7 +52,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       if (newTask.dueDate != null && newTask.status != TaskStatus.completed){
         Timer(_selectedDateTime!.difference(DateTime.now()), () {
           print('Expired');
-          ref.watch(taskProvider.notifier).updateTaskStatus(newTask.id, TaskStatus.overdue);
+          ref.read(taskProvider.notifier).updateTaskStatus(newTask.id, TaskStatus.overdue);
         });
       }
     });
@@ -71,7 +71,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20)),
       child: SizedBox(
-        height: 300,
+        height: 350,
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Form(
@@ -79,8 +79,8 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomTextField(hintText: 'Title', controller: _titleController, keyboardType: TextInputType.text, validate: true,),
-                CustomTextField(hintText: 'Content', controller: _contentController, keyboardType: TextInputType.multiline,),
+                CustomTextField(hintText: 'Title', controller: _titleController, keyboardType: TextInputType.text, validate: true, maxLength: 25,),
+                CustomTextField(hintText: 'Content', controller: _contentController, keyboardType: TextInputType.multiline, maxLines: 5,),
                 Column(
                   children: [
                     TextButton.icon(
@@ -131,12 +131,16 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
 
 class CustomTextField extends StatelessWidget {
   final String hintText;
+  final int? maxLength;
+  final int maxLines;
   final TextEditingController controller;
   final TextInputType keyboardType;
   final bool validate;
   const CustomTextField({
     super.key,
     this.validate=false,
+    this.maxLength,
+    this.maxLines=1,
     required this.hintText,
     required this.controller,
     required this.keyboardType
@@ -144,25 +148,26 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: TextFormField(
-        validator: !validate ? null : (value){
-          if (value == null || value.trim().isEmpty){
-            return '$hintText field must not be empty';
-          }
-          return null;
-        },
-        keyboardType: keyboardType,
-        controller: controller,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: hintText,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10)
+    return TextFormField(
+      maxLength: maxLength,
+      maxLines: maxLines,
+      validator: !validate ? null : (value){
+        if (value == null || value.trim().isEmpty){
+          return '$hintText field must not be empty';
+        }
+        return null;
+      },
+      keyboardType: keyboardType,
+      controller: controller,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none 
         ),
+        hintText: hintText,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5)
       ),
     );
   }

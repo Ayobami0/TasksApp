@@ -95,7 +95,7 @@ showTaskPopUp(BuildContext context, Task task, WidgetRef ref){
                             await showDeleteDialog(ctx).then((value){
                               if (!value) return;
                               Navigator.of(ctx).pop();
-                              ref.watch(taskProvider.notifier).removeFromTasks(task.id);
+                              ref.read(taskProvider.notifier).removeFromTasks(task.id);
                               ScaffoldMessenger.of(ctx).clearSnackBars();
                               ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Task deleted!')));
                             });
