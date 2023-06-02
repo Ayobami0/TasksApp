@@ -71,56 +71,58 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20)),
       child: SizedBox(
-        height: 350,
+        height: 370,
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextField(hintText: 'Title', controller: _titleController, keyboardType: TextInputType.text, validate: true, maxLength: 25,),
-                CustomTextField(hintText: 'Content', controller: _contentController, keyboardType: TextInputType.multiline, maxLines: 5,),
-                Column(
-                  children: [
-                    TextButton.icon(
-                      onPressed: () async{
-                        await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2050)
-                        ).then((dateValue) async{
-                          if (dateValue == null) return;
-                          await showTimePicker(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomTextField(hintText: 'Title', controller: _titleController, keyboardType: TextInputType.text, validate: true, maxLength: 25,),
+                  CustomTextField(hintText: 'Content', controller: _contentController, keyboardType: TextInputType.multiline, maxLines: 5,),
+                  Column(
+                    children: [
+                      TextButton.icon(
+                        onPressed: () async{
+                          await showDatePicker(
                             context: context,
-                            initialTime: TimeOfDay.now()
-                          ).then((timeValue){
-                            setState(() {
-                              if (timeValue == null) return;
-                              _selectedDateTime = dateValue.add(Duration(
-                                hours: timeValue.hour,
-                                minutes: timeValue.minute
-                              ));
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2050)
+                          ).then((dateValue) async{
+                            if (dateValue == null) return;
+                            await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now()
+                            ).then((timeValue){
+                              setState(() {
+                                if (timeValue == null) return;
+                                _selectedDateTime = dateValue.add(Duration(
+                                  hours: timeValue.hour,
+                                  minutes: timeValue.minute
+                                ));
+                              });
                             });
+                          }).onError((error, stackTrace){
+                            print(error);
                           });
-                        }).onError((error, stackTrace){
-                          print(error);
-                        });
-                      }, 
-                      icon: const Icon(Icons.event), 
-                      label: const Text('Due Date'),
-                    ),
-                    Text(_selectedDateTime != null ? DateFormat.yMMMEd().add_jm().format(_selectedDateTime!) : '-')
-                  ],
-                ),
-                _isSaving ? const CircularProgressIndicator() : ElevatedButton(
-                  onPressed: () async{
-                                      await _saveTask();
-                                    },
-                  child: const Text('CREATE TASK')
-                )
-              ],
+                        }, 
+                        icon: const Icon(Icons.event), 
+                        label: const Text('Due Date'),
+                      ),
+                      Text(_selectedDateTime != null ? DateFormat.yMMMEd().add_jm().format(_selectedDateTime!) : '-')
+                    ],
+                  ),
+                  _isSaving ? const CircularProgressIndicator() : ElevatedButton(
+                    onPressed: () async{
+                                        await _saveTask();
+                                      },
+                    child: const Text('CREATE TASK')
+                  )
+                ],
+              ),
             ),
           ),
         ),

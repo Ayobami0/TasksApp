@@ -36,7 +36,7 @@ class TaskTile extends ConsumerWidget {
         key: key!,
         child: ListTile(
           onTap: (){
-            showTaskPopUp(context, task, ref);
+            showTaskPopUp(context, task.id);
           },
           title: Text(task.title,),
           subtitle: Row(

@@ -15,7 +15,7 @@ class CustomFloatingActionButton extends StatelessWidget {
         );
       },
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8)
+        borderRadius: BorderRadius.circular(10)
       ),
       child: const Icon(Icons.add),
     );

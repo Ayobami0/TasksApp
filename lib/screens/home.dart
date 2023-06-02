@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tasks/models/task.dart';
+import 'package:tasks/providers/mode.dart';
 import 'package:tasks/widgets/floating_action_button.dart';
 import 'package:tasks/widgets/task_tile.dart';
+
+import '../widgets/status_count_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -13,20 +16,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final List<TaskStatus> _filter = [];
-
-  // filter(){
-  //   if (filter.isEmpty) {
-  //     _taskList = ref.watch(taskProvider);
-  //     return;
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
-  List<Task> taskList = ref.watch(taskProvider);
-                    final displayedList = _filter.isEmpty ?  taskList : 
-                      taskList.where((element) => _filter.contains(element.status)).toList()
-                    ;
+  final List<Task> taskList = ref.watch(taskProvider);
+  final displayedList = _filter.isEmpty ?  taskList : 
+    taskList.where((element) => _filter.contains(element.status)).toList()
+  ;
     return Scaffold(
       floatingActionButton: CustomFloatingActionButton(onPressed: (){}),
       body: SafeArea(
@@ -35,6 +30,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             children: [
               const SizedBox(height: 10,),
+              Align(
+                alignment: Alignment.centerRight,
+                child: LightDarkSwitch(),
+              ),
               Row(
                 children: const [
                   Expanded(child: StatusCountWidget(status: 'COMPETED', taskStatus: TaskStatus.completed, icon: Icons.task_alt)),
@@ -51,7 +50,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               //     icon: const Icon(Icons.filter_list),
               //   ),
               // ),
-              Wrap(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: TaskStatus.values.map(
                 (e) {
                   return FilterChip(
@@ -96,26 +96,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-class StatusCountWidget extends ConsumerWidget {
-  final String status;
-  final TaskStatus taskStatus;
-  final IconData icon;
+class LightDarkSwitch extends ConsumerWidget {
+  LightDarkSwitch({
+    super.key,
+  });
 
-  const StatusCountWidget({super.key, required this.status, required this.taskStatus, required this.icon});
+  final MaterialStateProperty<Icon?> thumbIcon =
+      MaterialStateProperty.resolveWith<Icon?>(
+    (Set<MaterialState> states) {
+      if (states.contains(MaterialState.selected)) {
+        return const Icon(Icons.dark_mode);
+      }
+      return const Icon(Icons.light_mode);
+    },
+  );
 
   @override
   Widget build(BuildContext context, ref) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text(status),
-            Icon(icon),
-            Text(ref.watch(taskProvider).where((element) => element.status == taskStatus).length.toString())
-          ],
-        ),
-      ),
+    final isDark = ref.watch(brightnessProvider);
+    return Switch(
+      thumbIcon: thumbIcon,
+      value: isDark,
+      onChanged: (value){
+        ref.read(brightnessProvider.notifier).changeMode();
+      },
     );
   }
 }
