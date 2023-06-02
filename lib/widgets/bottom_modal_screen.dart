@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -47,6 +49,12 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       setState(() {
             _isSaving = false;
           });
+      if (newTask.dueDate != null && newTask.status != TaskStatus.completed){
+        Timer(_selectedDateTime!.difference(DateTime.now()), () {
+          print('Expired');
+          ref.watch(taskProvider.notifier).updateTaskStatus(newTask.id, TaskStatus.overdue);
+        });
+      }
     });
   }
 

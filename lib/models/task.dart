@@ -9,7 +9,7 @@ class Task {
   final String id;
   final String title;
   final String? content;
-  final DateTime? startDate;
+  final DateTime startDate;
   final DateTime? dueDate;
   final bool isPinned;
   final TaskStatus status; 
@@ -19,6 +19,9 @@ class Task {
   formatDueDate(){
     if(dueDate == null) return;
     return DateFormat.yMMMEd().add_jm().format(dueDate!);
+  }
+  formatCreatedDate(){
+    return DateFormat.yMMMEd().add_jm().format(startDate);
   }
 }
 
