@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:tasks/models/database.dart';
 
 enum TaskStatus {
   completed,pending,overdue
@@ -16,6 +17,30 @@ class Task {
   
   Task({this.isPinned=false, this.status=TaskStatus.pending, required this.id, required this.title, required this.content,required this.dueDate, required this.startDate});
 
+  factory Task.fromJson(Map<String, dynamic> json){
+    print(json);
+    return Task(
+      id: json['id'],
+      title: json['title'],
+      content: json['description'],
+      startDate: DateTime.parse(json['createdOn']),
+      status: TaskStatus.values.singleWhere((element) => element.name == json['status']),
+      isPinned: json['isPinned'] == 1,
+      dueDate: DateTime.tryParse(json['expiresOn'] ?? ''),
+    );
+  }
+  Map<String, dynamic> toMap(){
+    return {
+      'id': id,
+      'title': title,
+      'description': content,
+      'expiresOn': dueDate?.toIso8601String(),
+      'createdOn': startDate.toIso8601String(),
+      'status': status.name,
+      'isPinned': isPinned ? 1 : 0,
+    };
+  }
+
   formatDueDate(){
     if(dueDate == null) return;
     return DateFormat.yMMMEd().add_jm().format(dueDate!);
@@ -27,14 +52,21 @@ class Task {
 
 class TasksNotifier extends StateNotifier<List<Task>>{
   TasksNotifier():super([]);
-
-  addToTasks(Task task){
-    state = [task, ...state];
+  
+  Future readFromDB() async{
+    state = await DatabaseRepository.query();
   }
-  removeFromTasks(String taskId){
-    state = state.where((element) => element.id != taskId).toList();
+  Future addToTasks(Task task) async{
+    // state = [task, ...state];
+    await DatabaseRepository.insert(task);
+    await readFromDB();
   }
-  updateTaskStatus(String taskId, TaskStatus status){
+  Future removeFromTasks(String taskId) async{
+    // state = state.where((element) => element.id != taskId).toList();
+    await DatabaseRepository.delete(taskId);
+    await readFromDB();
+  }
+  Future updateTaskStatus(String taskId, TaskStatus status) async{
     final task = state.singleWhere((element) => element.id == taskId);
     final newTask = Task(
       id: taskId,
@@ -45,10 +77,12 @@ class TasksNotifier extends StateNotifier<List<Task>>{
       isPinned: task.isPinned,
       status: status
     );
-    state = [
-      for (final t in state) if(t.id != taskId) t,
-      newTask
-    ];
+    // state = [
+    //   for (final t in state) if(t.id != taskId) t,
+    //   newTask
+    // ];
+    await DatabaseRepository.update(newTask);
+    await readFromDB();
   }
 }
 

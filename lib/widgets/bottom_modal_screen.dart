@@ -42,9 +42,8 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       content: _contentController.value.text,
     );
     
-    ref.read(taskProvider.notifier).addToTasks(newTask);
     _formKey.currentState!.save();
-    await Future.delayed(const Duration(seconds: 2)).then((value) {
+    await ref.read(taskProvider.notifier).addToTasks(newTask).then((value) {
       Navigator.pop(context);
       setState(() {
             _isSaving = false;

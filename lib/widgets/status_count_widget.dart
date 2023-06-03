@@ -18,7 +18,7 @@ class StatusCountWidget extends ConsumerWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Text(status),
+            FittedBox(child: Text(status)),
             Icon(icon),
             Text(ref.watch(taskProvider).where((element) => element.status == taskStatus).length.toString(), style: const TextStyle(fontSize: 20),)
           ],

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tasks/models/database.dart';
 import 'package:tasks/providers/mode.dart';
 import 'package:tasks/screens/home.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseRepository.initDB();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -20,7 +23,7 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         brightness: !isDark ? Brightness.light : Brightness.dark,
         useMaterial3: true,
-        fontFamily: GoogleFonts.poppins().fontFamily,
+        fontFamily: GoogleFonts.lato().fontFamily,
       ),
       home: const HomeScreen(),
     );

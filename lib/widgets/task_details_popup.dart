@@ -78,7 +78,7 @@ class TaskDialogWidget extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.black12,
+                        color: Theme.of(context).primaryColor.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(

@@ -18,7 +18,7 @@ class TaskTile extends ConsumerWidget {
           padding: const EdgeInsets.only(right: 20),
       decoration: BoxDecoration(
         color: Colors.red,
-        borderRadius: BorderRadius.circular(2)
+        borderRadius: BorderRadius.circular(8)
       ),
           alignment: Alignment.centerRight, 
           child: const Icon(Icons.delete)
