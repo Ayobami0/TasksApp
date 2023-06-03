@@ -18,7 +18,6 @@ class Task {
   Task({this.isPinned=false, this.status=TaskStatus.pending, required this.id, required this.title, required this.content,required this.dueDate, required this.startDate});
 
   factory Task.fromJson(Map<String, dynamic> json){
-    print(json);
     return Task(
       id: json['id'],
       title: json['title'],

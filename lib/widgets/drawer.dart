@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:tasks/screens/home.dart';
+import 'package:tasks/screens/settings.dart';
 
 class CustomDrawer extends StatelessWidget {
   final String activePage;
@@ -15,8 +17,28 @@ class CustomDrawer extends StatelessWidget {
           const DrawerHeader(
             child: CircleAvatar(),
           ),
-          DrawerListTile(activePage: activePage, tileName: 'Tasks', iconData: Icons.task,),
-          DrawerListTile(activePage: activePage, tileName: 'Settings', iconData: Icons.settings,),
+          DrawerListTile(
+            activePage: activePage,
+            tileName: 'Tasks',
+            iconData: Icons.task,
+            onTap: (){
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context)=>const HomeScreen())
+              );
+            },
+          ),
+          DrawerListTile(
+            activePage: activePage,
+            tileName: 'Settings',
+            iconData: Icons.settings,
+            onTap: (){
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context)=>const SettingsScreen())
+              );
+            },
+          ),
         ],
       ),
     );
@@ -35,7 +57,7 @@ class DrawerListTile extends StatelessWidget {
   final String activePage;
   final String tileName;
   final IconData iconData;
-  final Function? onTap;
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +66,7 @@ class DrawerListTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 5),
       child: ListTile(
+        onTap: onTap,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(30),

@@ -23,7 +23,7 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         brightness: !isDark ? Brightness.light : Brightness.dark,
         useMaterial3: true,
-        fontFamily: GoogleFonts.lato().fontFamily,
+        // fontFamily: GoogleFonts.lato().fontFamily,
       ),
       home: const HomeScreen(),
     );
