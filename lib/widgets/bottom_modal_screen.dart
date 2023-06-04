@@ -18,11 +18,16 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
 
   bool _isSaving = false;
 
+  bool _remindTask = false;
+
   final TextEditingController _titleController = TextEditingController();
 
   final TextEditingController _contentController = TextEditingController();
 
   DateTime? _selectedDateTime;
+
+  late TasksNotifier _taskProvider;
+
 
   Future _saveTask() async{
     final isValid = _formKey.currentState!.validate();
@@ -40,22 +45,38 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       dueDate: _selectedDateTime,
       title: _titleController.value.text,
       content: _contentController.value.text,
+      isPinned: _remindTask, 
     );
     
-    _formKey.currentState!.save();
-    await ref.read(taskProvider.notifier).addToTasks(newTask).then((value) {
-      Navigator.pop(context);
-      setState(() {
+    await _taskProvider.addToTasks(newTask).then(
+      (value){
+        Navigator.of(context).pop();
+        _formKey.currentState!.save();
+        setState(() {
             _isSaving = false;
-          });
-      if (newTask.dueDate != null && newTask.status != TaskStatus.completed){
-        Timer(_selectedDateTime!.difference(DateTime.now()), () {
-          print('Expired');
-          ref.read(taskProvider.notifier).updateTaskStatus(newTask.id, TaskStatus.overdue);
         });
+      });
+    if (newTask.dueDate != null && newTask.status != TaskStatus.completed){
+      if (newTask.isPinned) {
+        Timer(
+          _selectedDateTime!.subtract(const Duration(minutes: 1)).difference(DateTime.now()),         () {
+            print('Reminding ${newTask.id}');
+          });
       }
-    });
+      Timer(_selectedDateTime!.difference(DateTime.now()), () async{
+        print('Expired');
+        await _taskProvider.updateTaskStatus(
+          newTask.id,
+          TaskStatus.overdue
+        );
+      });
+    }
   }
+  @override
+    void didChangeDependencies() {
+      super.didChangeDependencies();
+      _taskProvider = ProviderScope.containerOf(context).read(taskProvider.notifier);
+    }
 
   @override
     void dispose() {
@@ -70,14 +91,12 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20)),
       child: SizedBox(
-        height: 370,
         child: Padding(
-          padding: const EdgeInsets.all(25.0),
+          padding: const EdgeInsets.all(15.0),
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CustomTextField(hintText: 'Title', controller: _titleController, keyboardType: TextInputType.text, validate: true, maxLength: 25,),
                   CustomTextField(hintText: 'Content', controller: _contentController, keyboardType: TextInputType.multiline, maxLines: 5,),
@@ -114,10 +133,19 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
                       Text(_selectedDateTime != null ? DateFormat.yMMMEd().add_jm().format(_selectedDateTime!) : '-')
                     ],
                   ),
+                  SwitchListTile(
+                    title: const Text('Remind Task'),
+                    value: _remindTask,
+                    onChanged: (bool value){
+                      setState((){
+                        _remindTask = value;
+                      });
+                    }
+                  ),
                   _isSaving ? const CircularProgressIndicator() : ElevatedButton(
                     onPressed: () async{
-                                        await _saveTask();
-                                      },
+                      await _saveTask();
+                    },
                     child: const Text('CREATE TASK')
                   )
                 ],

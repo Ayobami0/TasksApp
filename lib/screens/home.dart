@@ -81,7 +81,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   itemBuilder: (ctx, idx){
                     return TaskTile(
                       task: displayedList[idx], 
-                      key: UniqueKey(),
                     );
                   }
                 ),

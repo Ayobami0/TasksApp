@@ -7,10 +7,12 @@ import 'light_dark_switch.dart';
 class CustomAppBarWidget extends StatelessWidget {
   const CustomAppBarWidget({
     super.key,
+    this.showBrightnessSwitch=true,
     required this.scaffoldKey,
   });
 
   final GlobalKey<ScaffoldState> scaffoldKey;
+  final bool showBrightnessSwitch;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class CustomAppBarWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         DrawerOpener(scaffoldKey: scaffoldKey),
-        LightDarkSwitch(),
+        if(showBrightnessSwitch) LightDarkSwitch(),
       ],
     );
   }

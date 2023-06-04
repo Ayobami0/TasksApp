@@ -6,7 +6,7 @@ import 'package:tasks/widgets/task_details_popup.dart';
 
 class TaskTile extends ConsumerWidget {
   final Task task;
-  const TaskTile({required super.key, required this.task});
+  const TaskTile({super.key, required this.task});
 
   @override
   Widget build(BuildContext context, ref) {
@@ -33,7 +33,7 @@ class TaskTile extends ConsumerWidget {
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Task deleted!')));
         },
-        key: key!,
+        key: ValueKey(task.id),
         child: ListTile(
           onTap: (){
             showTaskPopUp(context, task.id);
