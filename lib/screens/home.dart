@@ -72,6 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 10,),
               Expanded(
                 child: displayedList.isEmpty ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Text('You have no tasks!')
                   ],

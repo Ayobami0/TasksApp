@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:tasks/models/task.dart';
+import 'package:tasks/providers/reminder.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateTaskDialog extends ConsumerStatefulWidget {
@@ -18,6 +19,8 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
 
   bool _isSaving = false;
 
+  final int _remindWhen = 1; // in minutes
+
   bool _remindTask = false;
 
   final TextEditingController _titleController = TextEditingController();
@@ -28,6 +31,11 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
 
   late TasksNotifier _taskProvider;
 
+  /// Check that the _selectedDateTime is not less than then remind time
+  /// to prevent execution of the reminder in the past
+  bool _checkDifference() {
+    return _selectedDateTime!.difference(DateTime.now()).inMinutes <= _remindWhen;
+  }
 
   Future _saveTask() async{
     final isValid = _formKey.currentState!.validate();
@@ -50,16 +58,18 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
     
     await _taskProvider.addToTasks(newTask).then(
       (value){
-        Navigator.of(context).pop();
         _formKey.currentState!.save();
         setState(() {
             _isSaving = false;
         });
+        Navigator.of(context).pop();
       });
     if (newTask.dueDate != null && newTask.status != TaskStatus.completed){
-      if (newTask.isPinned) {
+      if (newTask.isPinned && !_checkDifference()) {
         Timer(
-          _selectedDateTime!.subtract(const Duration(minutes: 1)).difference(DateTime.now()),         () {
+          _selectedDateTime!.subtract(Duration(
+            minutes: ref.watch(reminderTimeProvider)
+          )).difference(DateTime.now()),         () {
             print('Reminding ${newTask.id}');
           });
       }
@@ -136,7 +146,9 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
                   SwitchListTile(
                     title: const Text('Remind Task'),
                     value: _remindTask,
-                    onChanged: (bool value){
+                    onChanged: _selectedDateTime == null || _checkDifference() || !ref.watch(remindProvider)
+                      ? null 
+                      : (bool value){
                       setState((){
                         _remindTask = value;
                       });
@@ -156,6 +168,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       ),
     );
   }
+
 }
 
 class CustomTextField extends StatelessWidget {
