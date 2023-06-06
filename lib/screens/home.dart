@@ -4,6 +4,7 @@ import 'package:tasks/models/task.dart';
 import 'package:tasks/widgets/floating_action_button.dart';
 import 'package:tasks/widgets/task_tile.dart';
 
+import '../services/notification_service.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/drawer.dart';
 import '../widgets/status_count_widget.dart';
@@ -18,7 +19,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final List<TaskStatus> _filter = [];
   final _key = GlobalKey<ScaffoldState>();
-  
+
   @override
     void initState() {
       super.initState();

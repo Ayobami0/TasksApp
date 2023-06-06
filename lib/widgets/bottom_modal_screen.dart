@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:tasks/models/task.dart';
 import 'package:tasks/providers/reminder.dart';
+import 'package:tasks/services/notification_service.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateTaskDialog extends ConsumerStatefulWidget {
@@ -28,6 +29,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
   final TextEditingController _contentController = TextEditingController();
 
   DateTime? _selectedDateTime;
+  NotificationService notificationService = NotificationService();
 
   late TasksNotifier _taskProvider;
 
@@ -36,6 +38,7 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
   bool _checkDifference() {
     return _selectedDateTime!.difference(DateTime.now()).inMinutes <= _remindWhen;
   }
+  
 
   Future _saveTask() async{
     final isValid = _formKey.currentState!.validate();
@@ -69,12 +72,21 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
         Timer(
           _selectedDateTime!.subtract(Duration(
             minutes: ref.watch(reminderTimeProvider)
-          )).difference(DateTime.now()),         () {
+          )).difference(DateTime.now()),() async{
             print('Reminding ${newTask.id}');
+            await notificationService.showNotification(
+              'Reminder!',
+              """Your task ${newTask.title} will expire on ${DateFormat.yMMMEd(newTask.dueDate)}. 
+              Complete it before then""",
+              newTask.id);
           });
       }
       Timer(_selectedDateTime!.difference(DateTime.now()), () async{
         print('Expired');
+        await notificationService.showNotification(
+          'Task Expired!',
+          "Your task ${newTask.title} has expired.",
+          newTask.id);
         await _taskProvider.updateTaskStatus(
           newTask.id,
           TaskStatus.overdue
@@ -82,6 +94,11 @@ class _CreateTaskDialogState extends ConsumerState<CreateTaskDialog> {
       });
     }
   }
+  @override
+    void initState() {
+      super.initState();
+      notificationService.init();
+    }
   @override
     void didChangeDependencies() {
       super.didChangeDependencies();

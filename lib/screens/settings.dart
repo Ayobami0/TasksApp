@@ -91,9 +91,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 enum ReminderTime {
+  remindIn1Min(1, '1min to deadline'),
   remindIn15Mins(15, '15mins to deadline'),
   remindIn30Mins(30, '30mins to deadline'),
-  remindIn1Hour(60, '1hrs to deadline'),
+  remindIn1Hour(60, '1hr to deadline'),
   remindIn12Hours(12*60, '12hrs to deadline'),
   remindIn1day(60*24, '1day to deadline'),
   remindIn1week(7*60*24, '1week to deadline');

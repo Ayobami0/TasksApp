@@ -59,6 +59,8 @@ class TaskDialogWidget extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 5,),
+                  Icon(task.isPinned ? Icons.notifications_active : Icons.notifications_off),
+                  const SizedBox(height: 5,),
                   Text(
                     'Created on: ${task.formatCreatedDate()}',
                     style: Theme.of(context).textTheme.bodyMedium,
